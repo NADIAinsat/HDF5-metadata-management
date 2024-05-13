@@ -1,6 +1,7 @@
 import h5py
 import json
 import numpy as np
+import os
 
 def convert_to_json_serializable(value):
     if isinstance(value, np.ndarray):  #checks if a value is a NumPy array
@@ -34,17 +35,21 @@ def read_hdf5_metadata(file_path):
         traverse('', f)
     return metadata
 
+directory = "C:/PFE project/HDF5 Files"
+# Iterate over the files in directory and subdirectories
+for root, dirs, files in os.walk(directory):
+    for filename in files:
+        if filename.endswith('.h5'):  # Check if the file is an HDF5 file
+            file_path = os.path.join(root, filename)
+            metadata = read_hdf5_metadata(file_path)
+            # Serializing json
+            json_object = json.dumps(metadata, indent=4, default=str)  # Using default=str to handle non-serializable types
+            # Writing to .json
+            with open("C:/PFE project/JSON files/"+ os.path.splitext(filename)[0] +".json", "w") as outfile:
+                outfile.write(json_object)
 
-file_path = r'C:/PFE project/HDF5 Files/pressure_mat.h5'
-metadata = read_hdf5_metadata(file_path)
 
 # Print the metadata
 #for key, value in metadata.items():
 #    print(f"{key}: {value}")
 
-# Serializing json
-json_object = json.dumps(metadata, indent=4, default=str)  # Using default=str to handle non-serializable types
-
-# Writing to sample.json
-with open("pressure.json", "w") as outfile:
-    outfile.write(json_object)
